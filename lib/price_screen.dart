@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'coin_data.dart';
+import 'dart:io' show Platform;
 
 class PriceScreen extends StatefulWidget {
   @override
@@ -10,8 +12,8 @@ class _PriceScreenState extends State<PriceScreen> {
   // property of selected currency
   String selectedCurrency = 'USD';
 
-  // method to get the dropDownItems
-  List<DropdownMenuItem> getDropdownItems() {
+  DropdownButton<String> androidDropDown() {
+
     List<DropdownMenuItem<String>> dropDownItems = [];
     for (String currency in currenciesList) {
       // get the string curr in the list
@@ -24,8 +26,38 @@ class _PriceScreenState extends State<PriceScreen> {
       dropDownItems.add(newItem);
     }
 
-    return dropDownItems;
+    return DropdownButton<String>(
+      value: selectedCurrency,
+      items: dropDownItems,
+      onChanged: (value) {
+        // update the selected currency
+        setState(
+          () {
+            selectedCurrency = value;
+          },
+        );
+      },
+    );
   }
+
+  // cupertino picker - will use for IOS
+  CupertinoPicker iosPicker() {
+    List<Text> pickerItems = [];
+    for (String currency in currenciesList) {
+      var item = Text(currency);
+      pickerItems.add(item);
+    }
+
+    return CupertinoPicker(
+      backgroundColor: Colors.lightBlue,
+      itemExtent: 32.0,
+      onSelectedItemChanged: (selectedIndex) {
+        print(selectedIndex);
+      },
+      children: pickerItems,
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -59,19 +91,11 @@ class _PriceScreenState extends State<PriceScreen> {
             ),
           ),
           Container(
-            height: 150.0,
-            alignment: Alignment.center,
-            padding: EdgeInsets.only(bottom: 30.0),
-            color: Colors.lightBlue,
-            child: DropdownButton<String>(
-                value: selectedCurrency,
-                items: getDropdownItems(),
-                onChanged: (value) {
-                  // update the selected currency
-                  setState(() {
-                    selectedCurrency = value;
-                  });
-                }),
+              height: 150.0,
+              alignment: Alignment.center,
+              padding: EdgeInsets.only(bottom: 30.0),
+              color: Colors.lightBlue,
+              child: Platform.isIOS ? iosPicker() : androidDropDown(),
           ),
         ],
       ),
